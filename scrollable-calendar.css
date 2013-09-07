@@ -1,0 +1,21 @@
+.col-column {
+    float:left;
+    text-align: center;
+    border: 0px solid #333;
+    box-sizing: border-box;
+
+}
+.cal-head {
+    border-bottom: 1px solid #ddd;
+}
+#cal-head-year {
+    text-align: center;
+    font-size: 24px;
+}
+.cal-body {
+    overflow-y: auto;
+}
+.cal-day-number {
+    vertical-align: middle;
+    text-align: center;
+}

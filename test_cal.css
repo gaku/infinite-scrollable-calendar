@@ -1,0 +1,11 @@
+#calendar-div {
+    position: absolute;
+    top: 200px;
+    left: 150px;
+    width: 300px;
+    height: 600px;
+}
+body {
+    font-family: "Helvetica Neue";
+    font-weight: 200;
+}
