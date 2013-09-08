@@ -1,6 +1,7 @@
 var module = angular.module('scrollableCalendarModule', []);
 
 module.controller('scrollableCalendarController', function($scope) {
+    var scrollbarOffset = 20;
     $scope.setup = function(baseDate) {
         var day = moment(baseDate).utc();
         day.startOf('month');  // first day of the month
@@ -8,7 +9,7 @@ module.controller('scrollableCalendarController', function($scope) {
         return day;
     }
     $scope.computeDimentions = function(element) {
-        var parentWidth = jQuery(element).innerWidth() - 20 /* scroll bar */;
+        var parentWidth = jQuery(element).innerWidth() - scrollbarOffset;
         var width = Math.floor(parentWidth / 7);
         $scope.unitWidth = width;
     }
@@ -56,6 +57,8 @@ module.controller('scrollableCalendarController', function($scope) {
     $scope.generateRow = function(param) {
         var day = param.clone();
         var html = jQuery('<div class="cal-row"></div>');
+        html.css({'width': $scope.unitWidth * 7 + "px"});
+
         for (var i = 0; i < 7; ++i) {
             var dayDiv = jQuery('<div class="col-column"></div>');
             // dayDiv.text(day.utc().format('MMM D'));
@@ -95,6 +98,9 @@ module.controller('scrollableCalendarController', function($scope) {
                 $scope.updateRange($scope.rangeA, event_info.currentTarget.id);
                 $scope.selecting = false;
                 $scope.$apply();
+                if ($scope.callback) {
+                    $scope.callback($scope.startDate, $scope.endDate);
+                }
             });
 
             html.append(dayDiv);
@@ -105,9 +111,10 @@ module.controller('scrollableCalendarController', function($scope) {
     $scope.setupHeading = function(inputDay) {
         var day = inputDay.clone();
         var height = $scope.unitWidth * 1.5;
-        $scope.head.css({'height':height});
+        var width = $scope.unitWidth * 7
+        $scope.head.css({'height':height, 'width': width});
         $scope.headYear = jQuery('<div id="cal-head-year"></div>');
-        $scope.headYear.css({'height':$scope.unitWidth, 'width': $scope.unitWidth * 7});
+        $scope.headYear.css({'height':$scope.unitWidth, 'width': width});
 
         $scope.headYear.text(day.format('YYYY'));
 
@@ -126,7 +133,9 @@ module.controller('scrollableCalendarController', function($scope) {
     }
     $scope.setupBody = function(parentElement) {
         var height = parentElement.innerHeight() - $scope.head.innerHeight();
-        $scope.body.css({'height': height});
+        var width = parentElement.innerWidth();
+        $scope.body.css({'height': height, 'width': width});
+
     }
     $scope.refreshHeading = function() {
         var top = $scope.body.scrollTop();
@@ -161,7 +170,8 @@ module.directive('scrollableCalendar', function() {
        controller: 'scrollableCalendarController',
        scope: {
          'startDate': '=',
-         'endDate': '='
+         'endDate': '=',
+         'callback': '='
        },
        template: '<div class="cal-head"></div><div class="cal-body"></div>',
        link: function($scope, $element, $attrs) {
