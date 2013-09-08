@@ -19,12 +19,14 @@ module.controller('scrollableCalendarController', function($scope) {
         var startDay = moment($scope.rangeA).utc();
         var endDay = moment($scope.rangeB).utc();
         var numDays = endDay.diff(startDay, 'days');
+        $scope.dateFlipped = false;
         if (numDays < 0) {
             // flip
             var tmpDay = startDay;
             startDay = endDay;
             endDay = tmpDay;
             numDays = -1 * numDays;
+            $scope.dateFlipped = true;
         }
         // Update model if isSelecting == true
         if (isSelecting) {
@@ -44,6 +46,7 @@ module.controller('scrollableCalendarController', function($scope) {
     }
     $scope.updateRange = function(rangeA, rangeB) {
         // Unselect previous selection
+        console.log('updateRange:' + rangeA + "," + rangeB);
         $scope.selectRange(false);
         // Make a new selection
         $scope.rangeA = rangeA;
@@ -141,7 +144,12 @@ module.controller('scrollableCalendarController', function($scope) {
         if (($scope.startDate == undefined) || ($scope.endDate == undefined)) {
             return;
         }
-        $scope.updateRange($scope.startDate, $scope.endDate);
+        // this is required as update happens during dragging as well.
+        if (!$scope.dateFlipped) {
+            $scope.updateRange($scope.startDate, $scope.endDate);
+        } else {
+            $scope.updateRange($scope.endDate, $scope.startDate);
+        }
     }
     $scope.$watch('startDate', $scope.setDatesFromModel);
     $scope.$watch('endDate', $scope.setDatesFromModel);
@@ -160,6 +168,7 @@ module.directive('scrollableCalendar', function() {
            $scope.computeDimentions($element);
            $scope.body = jQuery($element).find(".cal-body");
            $scope.head = jQuery($element).find(".cal-head");
+           $scope.dateFlipped = false;
 
            var day = $scope.setup($attrs.baseDate);
            $scope.setupHeading(day);
