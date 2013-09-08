@@ -12,6 +12,32 @@ module.controller('scrollableCalendarController', function($scope) {
         var width = Math.floor(parentWidth / 7);
         $scope.unitWidth = width;
     }
+    $scope.dump = function() {
+        console.log("A:" + $scope.rangeA + " B:" + $scope.rangeB);
+    }
+    $scope.selectRange = function(isSelecting) {
+        var startDay = moment($scope.rangeA).utc();
+        var endDay = moment($scope.rangeB).utc();
+        var numDays = endDay.diff(startDay, 'days');
+        if (numDays < 0) {
+            // flip
+            var tmpDay = startDay;
+            startDay = endDay;
+            endDay = tmpDay;
+            numDays = -1 * numDays;
+        }
+        for (var i = 0; i <= numDays; ++i) {
+            var id = startDay.format('YYYY-MM-DD');
+            var div = $scope.body.find("#" + id);
+            if (isSelecting) {
+                div.css({'background-color': '#ddd'});
+            } else {
+                div.css({'background-color': ''});
+            }
+            startDay.add('days', 1);
+        }
+
+    }
     $scope.generateRow = function(param) {
         var day = param.clone();
         var html = jQuery('<div class="cal-row"></div>');
@@ -20,6 +46,7 @@ module.controller('scrollableCalendarController', function($scope) {
             // dayDiv.text(day.utc().format('MMM D'));
             dayDiv.css({'width': $scope.unitWidth + "px"});
             dayDiv.css({'height': $scope.unitWidth + "px"});
+            dayDiv.attr('id', day.utc().format('YYYY-MM-DD'));
 
             var dayMonth = jQuery('<div class="cal-day-month"></div>');
             dayMonth.css({'height':  $scope.unitWidth / 3 + "px"});
@@ -34,6 +61,31 @@ module.controller('scrollableCalendarController', function($scope) {
 
             dayDiv.append(dayMonth);
             dayDiv.append(dayNumber);
+
+            dayDiv.bind('mousedown', function(event_info) {
+                $scope.dump();
+
+                $scope.selectRange(false);
+                $scope.rangeA = event_info.currentTarget.id;
+                $scope.rangeB = event_info.currentTarget.id;
+                $scope.selecting = true;
+                $scope.selectRange(true);
+            });
+            dayDiv.bind('mousemove', function(event_info) {
+                if (event_info.which == 1) {
+                    if ($scope.rangeB != event_info.currentTarget.id) {
+                        $scope.selectRange(false);
+                        $scope.rangeB = event_info.currentTarget.id;
+                        $scope.selectRange(true);
+                    }
+                }
+            });
+            dayDiv.bind('mouseup', function(event_info) {
+                $scope.selectRange(false);
+                $scope.rangeB = event_info.currentTarget.id;
+                $scope.selecting = false;
+                $scope.selectRange(true);
+            });
 
             html.append(dayDiv);
             day.add('days', 1);
