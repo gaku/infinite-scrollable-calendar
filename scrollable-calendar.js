@@ -47,7 +47,6 @@ module.controller('scrollableCalendarController', function($scope) {
     }
     $scope.updateRange = function(rangeA, rangeB) {
         // Unselect previous selection
-        console.log('updateRange:' + rangeA + "," + rangeB);
         $scope.selectRange(false);
         // Make a new selection
         $scope.rangeA = rangeA;
