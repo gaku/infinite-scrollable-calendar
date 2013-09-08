@@ -26,6 +26,11 @@ module.controller('scrollableCalendarController', function($scope) {
             endDay = tmpDay;
             numDays = -1 * numDays;
         }
+        // Update model if isSelecting == true
+        if (isSelecting) {
+            $scope.startDate = startDay.format('YYYY-MM-DD');
+            $scope.endDate = endDay.format('YYYY-MM-DD');
+        }
         for (var i = 0; i <= numDays; ++i) {
             var id = startDay.format('YYYY-MM-DD');
             var div = $scope.body.find("#" + id);
@@ -36,7 +41,14 @@ module.controller('scrollableCalendarController', function($scope) {
             }
             startDay.add('days', 1);
         }
-
+    }
+    $scope.updateRange = function(rangeA, rangeB) {
+        // Unselect previous selection
+        $scope.selectRange(false);
+        // Make a new selection
+        $scope.rangeA = rangeA;
+        $scope.rangeB = rangeB;
+        $scope.selectRange(true);
     }
     $scope.generateRow = function(param) {
         var day = param.clone();
@@ -63,28 +75,23 @@ module.controller('scrollableCalendarController', function($scope) {
             dayDiv.append(dayNumber);
 
             dayDiv.bind('mousedown', function(event_info) {
-                $scope.dump();
-
-                $scope.selectRange(false);
-                $scope.rangeA = event_info.currentTarget.id;
-                $scope.rangeB = event_info.currentTarget.id;
+                // Select the day
+                $scope.updateRange(event_info.currentTarget.id, event_info.currentTarget.id);
                 $scope.selecting = true;
-                $scope.selectRange(true);
+                $scope.$apply();
             });
             dayDiv.bind('mousemove', function(event_info) {
                 if (event_info.which == 1) {
                     if ($scope.rangeB != event_info.currentTarget.id) {
-                        $scope.selectRange(false);
-                        $scope.rangeB = event_info.currentTarget.id;
-                        $scope.selectRange(true);
+                        $scope.updateRange($scope.rangeA, event_info.currentTarget.id);
+                        $scope.$apply();
                     }
                 }
             });
             dayDiv.bind('mouseup', function(event_info) {
-                $scope.selectRange(false);
-                $scope.rangeB = event_info.currentTarget.id;
+                $scope.updateRange($scope.rangeA, event_info.currentTarget.id);
                 $scope.selecting = false;
-                $scope.selectRange(true);
+                $scope.$apply();
             });
 
             html.append(dayDiv);
@@ -129,11 +136,25 @@ module.controller('scrollableCalendarController', function($scope) {
 
         $scope.headYear.text(centerDay.format('YYYY MMMM'));
     }
+    // Angular -> UI
+    $scope.setDatesFromModel = function() {
+        if (($scope.startDate == undefined) || ($scope.endDate == undefined)) {
+            return;
+        }
+        $scope.updateRange($scope.startDate, $scope.endDate);
+    }
+    $scope.$watch('startDate', $scope.setDatesFromModel);
+    $scope.$watch('endDate', $scope.setDatesFromModel);
 });
+
 module.directive('scrollableCalendar', function() {
    return {
        restrict: 'A',
        controller: 'scrollableCalendarController',
+       scope: {
+         'startDate': '=',
+         'endDate': '='
+       },
        template: '<div class="cal-head"></div><div class="cal-body"></div>',
        link: function($scope, $element, $attrs) {
            $scope.computeDimentions($element);
@@ -155,6 +176,7 @@ module.directive('scrollableCalendar', function() {
            var endDay = day.clone();
            $scope.body.scrollTop(hiddenNumRows * $scope.unitWidth);
            $scope.refreshHeading();
+
            $scope.body.bind('scroll', function(event_info) {
                var top = $scope.body.scrollTop();
                var height = $scope.body[0].scrollHeight;

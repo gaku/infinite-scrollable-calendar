@@ -11,9 +11,13 @@
     <link rel="stylesheet" type="text/css" href="scrollable-calendar.css"/>
     <script type="text/javascript" src="demo_app.js"></script>
 </head>
-<body>
+<body ng-controller="demoAppController">
 
-<div id="calendar-div" scrollable-calendar base-date="2013-09-04">
+<input ng-model="startDate">
+<input ng-model="endDate">
+
+
+<div id="calendar-div" scrollable-calendar base-date="2013-09-04" start-date="startDate" end-date="endDate">
 
 </div>
 </body>
