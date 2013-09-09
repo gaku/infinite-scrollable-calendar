@@ -8,4 +8,6 @@ Infinite scrollable calendar directive for Angular.JS
 - Access `test_cal.html` from a browser.
 
 ## Setup
+- Use `base-date` attribute to specify a day where calendar is displayed.  The value should be Angular variable.
+If you need to pass a specific date declare as `base-date="'2013-09-09'"`.
 - `start-date` and `end-date` attributes of the directive are the Angular values that are used for two-way bindings.

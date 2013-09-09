@@ -120,19 +120,18 @@ module.controller('scrollableCalendarController', function($scope) {
         }
         return html;
     }
-    $scope.setupHeading = function(inputDay) {
-        var day = inputDay.clone();
+    $scope.setupHeading = function() {
         var height = $scope.unitWidth * 1.5;
         var width = $scope.unitWidth * 7
         $scope.head.css({'height':height, 'width': width});
         $scope.headYear = jQuery('<div id="cal-head-year"></div>');
         $scope.headYear.css({'height':$scope.unitWidth, 'width': width});
 
-        $scope.headYear.text(day.format('YYYY'));
 
         $scope.headDayOfWeek = jQuery('<div id="cal-head-dow"></div>');
         $scope.headDayOfWeek.css({'height':$scope.unitWidth*0.5});
 
+        var day = moment().utc().startOf('week');
         for (var i = 0; i < 7; ++i) {
             var dayDiv = jQuery('<div class="col-column"></div>');
             dayDiv.text(day.utc().format('ddd'));
@@ -183,6 +182,7 @@ module.directive('scrollableCalendar', function() {
        scope: {
          'startDate': '=',
          'endDate': '=',
+         'baseDate': '=',
          'callback': '='
        },
        template: '<div class="cal-head"></div><div class="cal-body"></div>',
@@ -192,21 +192,31 @@ module.directive('scrollableCalendar', function() {
            $scope.head = jQuery($element).find(".cal-head");
            $scope.dateFlipped = false;
 
-           var day = $scope.setup($attrs.baseDate);
-           $scope.setupHeading(day);
+           $scope.setupHeading();
            $scope.setupBody($element);
-           // going back 300px
-           var hiddenNumRows = Math.floor(300 / $scope.unitWidth);
-           day.subtract('days', 7 * hiddenNumRows);
-           $scope.beginDay = day.clone();
-           for (var i = 0; i < 50; ++i) {
-               var rowElement = $scope.generateRow(day);
-               $scope.body.append(rowElement);
-               day.add('days', 7);
+
+           $scope.addInitialCalendarDays = function() {
+               // Run it only once
+               if ($scope.initialized) {
+                   return;
+               }
+               $scope.inialized = true;
+               var day = $scope.setup($scope.baseDate);
+
+               // going back 300px
+               var hiddenNumRows = Math.floor(300 / $scope.unitWidth);
+               day.subtract('days', 7 * hiddenNumRows);
+               $scope.beginDay = day.clone();
+               for (var i = 0; i < 50; ++i) {
+                   var rowElement = $scope.generateRow(day);
+                   $scope.body.append(rowElement);
+                   day.add('days', 7);
+               }
+               var endDay = day.clone();
+               $scope.body.scrollTop(hiddenNumRows * $scope.unitWidth);
+               $scope.refreshHeading();
+               $scope.setDatesFromModel();
            }
-           var endDay = day.clone();
-           $scope.body.scrollTop(hiddenNumRows * $scope.unitWidth);
-           $scope.refreshHeading();
 
            $scope.body.bind('scroll', function(event_info) {
                var top = $scope.body.scrollTop();
@@ -233,6 +243,13 @@ module.directive('scrollableCalendar', function() {
                }
                $scope.refreshHeading();
            });
+
+           $scope.$watch('baseDate', function() {
+               console.log('basedate is now' + $scope.baseDate);
+               if ($scope.baseDate != undefined) {
+                   $scope.addInitialCalendarDays();
+               }
+           })
        }
     };
 });
