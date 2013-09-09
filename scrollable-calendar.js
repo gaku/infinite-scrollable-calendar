@@ -86,7 +86,20 @@ module.controller('scrollableCalendarController', function($scope) {
                 $scope.$apply();
             });
             dayDiv.bind('mousemove', function(event_info) {
-                if (event_info.which == 1) {
+                var leftButtonPressed = false;
+                if (event_info.buttons != undefined) {
+                    // Firefox returns event_info.which == 1 even if no mouse keys are pressed.
+                    // event_info.buttons is available on Firefox but not on Chrome.
+                    if (event_info.buttons == 1) {
+                        leftButtonPressed = true;
+                    }
+                } else {
+                    if (event_info.which == 1) {
+                        leftButtonPressed = true;
+                    }
+                }
+
+                if (leftButtonPressed) {
                     if ($scope.rangeB != event_info.currentTarget.id) {
                         $scope.updateRange($scope.rangeA, event_info.currentTarget.id);
                         $scope.$apply();
