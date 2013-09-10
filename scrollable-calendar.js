@@ -200,7 +200,7 @@ module.directive('scrollableCalendar', function() {
                if ($scope.initialized) {
                    return;
                }
-               $scope.inialized = true;
+               $scope.initialized = true;
                var day = $scope.setup($scope.baseDate);
 
                // going back 300px
@@ -236,16 +236,15 @@ module.directive('scrollableCalendar', function() {
                    // create rows at the bottom
                    var hiddenNumRows = Math.floor(300 / $scope.unitWidth);
                    for (var i = 0; i < hiddenNumRows; ++i) {
-                       var rowElement = $scope.generateRow(endDay);
+                       var rowElement = $scope.generateRow($scope.endDate);
                        $scope.body.append(rowElement);
-                       endDay.add('days', 7);
+                       $scope.endDate.add('days', 7);
                    }
                }
                $scope.refreshHeading();
            });
 
            $scope.$watch('baseDate', function() {
-               console.log('basedate is now' + $scope.baseDate);
                if ($scope.baseDate != undefined) {
                    $scope.addInitialCalendarDays();
                }
