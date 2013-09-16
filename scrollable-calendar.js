@@ -79,6 +79,7 @@ module.controller('scrollableCalendarController', function($scope) {
             dayDiv.append(dayMonth);
             dayDiv.append(dayNumber);
 
+            /*
             dayDiv.bind('mousedown', function(event_info) {
                 // Select the day
                 $scope.updateRange(event_info.currentTarget.id, event_info.currentTarget.id);
@@ -106,8 +107,16 @@ module.controller('scrollableCalendarController', function($scope) {
                     }
                 }
             });
+            */
+            $scope.firstClick = true;
             dayDiv.bind('mouseup', function(event_info) {
-                $scope.updateRange($scope.rangeA, event_info.currentTarget.id);
+                if ($scope.firstClick) {
+                    $scope.updateRange(event_info.currentTarget.id, event_info.currentTarget.id);
+                    $scope.firstClick = false;
+                } else {
+                    $scope.updateRange($scope.rangeA, event_info.currentTarget.id);
+                    $scope.firstClick = true;
+                }
                 $scope.selecting = false;
                 $scope.$apply();
                 if ($scope.callback) {
