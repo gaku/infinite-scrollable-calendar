@@ -3,7 +3,7 @@ var module = angular.module('scrollableCalendarModule', []);
 module.controller('scrollableCalendarController', function($scope) {
     var scrollbarOffset = 20;
     $scope.setup = function(baseDate) {
-        var day = moment(baseDate).utc();
+        var day = moment.utc(baseDate);
         day.startOf('month');  // first day of the month
         day.startOf('week');   // first day of the week (the row)
         return day;
@@ -17,8 +17,8 @@ module.controller('scrollableCalendarController', function($scope) {
         console.log("A:" + $scope.rangeA + " B:" + $scope.rangeB);
     }
     $scope.selectRange = function(isSelecting) {
-        var startDay = moment($scope.rangeA).utc();
-        var endDay = moment($scope.rangeB).utc();
+        var startDay = moment.utc($scope.rangeA);
+        var endDay = moment.utc($scope.rangeB);
         var numDays = endDay.diff(startDay, 'days');
         $scope.dateFlipped = false;
         if (numDays < 0) {
@@ -140,7 +140,7 @@ module.controller('scrollableCalendarController', function($scope) {
         $scope.headDayOfWeek = jQuery('<div id="cal-head-dow"></div>');
         $scope.headDayOfWeek.css({'height':$scope.unitWidth*0.5});
 
-        var day = moment().utc().startOf('week');
+        var day = moment.utc().startOf('week');
         for (var i = 0; i < 7; ++i) {
             var dayDiv = jQuery('<div class="col-column"></div>');
             dayDiv.text(day.utc().format('ddd'));
