@@ -32,3 +32,6 @@
 .cal-today {
     font-weight: bold;
 }
+.cal-weekend {
+    color: #FF5C33;
+}

@@ -87,6 +87,12 @@ module.controller('scrollableCalendarController', function($scope) {
                 // add CSS class cal-today to today's column
                 dayDiv.addClass('cal-today');
             }
+            var dow = day.day();
+            if ((dow == 0) || (dow == 6)) {
+                // weekend
+                dayNumber.addClass('cal-weekend');
+            }
+
             /*
             dayDiv.bind('mousedown', function(event_info) {
                 // Select the day
@@ -224,6 +230,7 @@ module.directive('scrollableCalendar', function() {
                // going back 300px
                var hiddenNumRows = Math.floor(300 / $scope.unitWidth);
                day.subtract('days', 7 * hiddenNumRows);
+
                $scope.beginDay = day.clone();
                for (var i = 0; i < 50; ++i) {
                    var rowElement = $scope.generateRow(day);
