@@ -9,7 +9,7 @@
     overflow-y: auto;
     float:left;
 }
-.col-column {
+.cal-column {
     float:left;
     text-align: center;
     border: 0px solid #333;
@@ -17,9 +17,18 @@
     user-select: none;
     -webkit-user-select: none;
 }
+.cal-column-even {
+    background-color: #f2f2f2;
+}
 .cal-day-number {
     vertical-align: middle;
     text-align: center;
     user-select: none;
     -webkit-user-select: none;
+}
+.selected {
+    background-color: #CEECF5;
+}
+.cal-today {
+    font-weight: bold;
 }

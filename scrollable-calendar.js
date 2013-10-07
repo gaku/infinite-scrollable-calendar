@@ -38,9 +38,9 @@ module.controller('scrollableCalendarController', function($scope) {
             var id = startDay.format('YYYY-MM-DD');
             var div = $scope.body.find("#" + id);
             if (isSelecting) {
-                div.css({'background-color': '#ddd'});
+                div.addClass('selected');
             } else {
-                div.css({'background-color': ''});
+                div.removeClass('selected');
             }
             startDay.add('days', 1);
         }
@@ -59,7 +59,7 @@ module.controller('scrollableCalendarController', function($scope) {
         html.css({'width': $scope.unitWidth * 7 + "px"});
 
         for (var i = 0; i < 7; ++i) {
-            var dayDiv = jQuery('<div class="col-column"></div>');
+            var dayDiv = jQuery('<div class="cal-column"></div>');
             // dayDiv.text(day.utc().format('MMM D'));
             dayDiv.css({'width': $scope.unitWidth + "px"});
             dayDiv.css({'height': $scope.unitWidth + "px"});
@@ -79,6 +79,14 @@ module.controller('scrollableCalendarController', function($scope) {
             dayDiv.append(dayMonth);
             dayDiv.append(dayNumber);
 
+            if((day.month() % 2) == 0) {
+                // even months
+                dayDiv.addClass('cal-column-even');
+            }
+            if (day.isSame($scope.today)) {
+                // add CSS class cal-today to today's column
+                dayDiv.addClass('cal-today');
+            }
             /*
             dayDiv.bind('mousedown', function(event_info) {
                 // Select the day
@@ -142,7 +150,7 @@ module.controller('scrollableCalendarController', function($scope) {
 
         var day = moment.utc().startOf('week');
         for (var i = 0; i < 7; ++i) {
-            var dayDiv = jQuery('<div class="col-column"></div>');
+            var dayDiv = jQuery('<div class="cal-column"></div>');
             dayDiv.text(day.utc().format('ddd'));
             dayDiv.css({'width': $scope.unitWidth + "px"});
             $scope.headDayOfWeek.append(dayDiv);
@@ -211,7 +219,8 @@ module.directive('scrollableCalendar', function() {
                }
                $scope.initialized = true;
                var day = $scope.setup($scope.baseDate);
-
+               var localNow = moment();
+               $scope.today = moment.utc([localNow.year(), localNow.month(), localNow.date()]);  // using UTC internally
                // going back 300px
                var hiddenNumRows = Math.floor(300 / $scope.unitWidth);
                day.subtract('days', 7 * hiddenNumRows);
